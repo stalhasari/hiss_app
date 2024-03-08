@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: const Color(0xFFBE9EFF),
         title: Text('Hoş Geldin $displayName!'),
       ),
-      body: const MapSample(),
+      body: const MapScreen(),
     );
   }
 }

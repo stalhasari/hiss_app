@@ -1,51 +1,61 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 
-class MapSample extends StatefulWidget {
-  const MapSample({Key? key}) : super(key: key);
+class MapScreen extends StatefulWidget {
+  const MapScreen({super.key});
 
   @override
-  State<MapSample> createState() => MapSampleState();
+  State<MapScreen> createState() => _MapScreenState();
 }
 
-class MapSampleState extends State<MapSample> {
-  final Completer<GoogleMapController> _controller =
-      Completer<GoogleMapController>();
+class _MapScreenState extends State<MapScreen> {
+  late GoogleMapController mapController;
+  Location location = Location();
+  LatLng? _currentP;
 
-  static const CameraPosition _kTurkey = CameraPosition(
-    target: LatLng(39.9208, 32.8541), // Türkiye'nin koordinatları
-    zoom: 6, // Yakınlaştırma seviyesi
-  );
+  @override
+  void initState() {
+    super.initState();
+    _setInitialCameraPosition();
+  }
+
+  Future<void> _setInitialCameraPosition() async {
+    LocationData currentLocation = await location.getLocation();
+    mapController.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: LatLng(currentLocation.latitude!, currentLocation.longitude!),
+          zoom: 15.0,
+        ),
+      ),
+    );
+    setState(() {
+      _currentP = LatLng(currentLocation.latitude!, currentLocation.longitude!);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: GoogleMap(
-        mapType: MapType.normal,
-        initialCameraPosition: _kTurkey, // Türkiye koordinatlarına göre başlangıç konumu
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
-        },
+    return GoogleMap(
+      myLocationButtonEnabled: true,
+      myLocationEnabled: true,
+      initialCameraPosition: const CameraPosition(
+        target: LatLng(40.655381, 35.836891),
+        zoom: 15.0,
       ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton.extended(
-            onPressed: _goToTurkey, // Türkiye'ye gitmek için butona basıldığında çalışacak metot
-            label: const Text('Türkiye\'ye git!'),
-            icon: const Icon(Icons.directions_boat),
-          ),
-          const SizedBox(height: 16), // Boşluk ekleyin
-          
-        ],
-      ),
+      onMapCreated: (GoogleMapController controller) {
+        mapController = controller;
+      },
+      markers: _currentP != null
+          ? {
+              Marker(
+                markerId: const MarkerId('myLocation'),
+                position: _currentP!,
+                infoWindow: const InfoWindow(title: 'Ben buradayım'),
+              ),
+            }
+          : {},
     );
-  }
-
-  Future<void> _goToTurkey() async {
-    final GoogleMapController controller = await _controller.future;
-    await controller.animateCamera(CameraUpdate.newCameraPosition(_kTurkey));
   }
 }
