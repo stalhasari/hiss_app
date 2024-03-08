@@ -39,7 +39,7 @@ dependencies:
   intl: ^0.17.0
   json_annotation: ^4.6.0
   
-  flutter_secure_storage: ^4.2.1
+  flutter_secure_storage: ^9.0.0
   lib: ^0.0.3
   flutter_web_auth_2: ^3.1.1
   flutter_svg: ^2.0.10+1
@@ -47,6 +47,7 @@ dependencies:
   iconsax: ^0.0.8
   get: ^4.6.6
   google_maps_flutter: ^2.2.8
+  location: ^5.0.3
 
 dev_dependencies:
   flutter_test:
